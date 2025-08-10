@@ -1,0 +1,131 @@
+# ═══════════════════════════════════════════════════════════════
+# AGGRESSIVE LORA TRAINING - WAN 14B MODEL
+# ═══════════════════════════════════════════════════════════════
+
+# Output path for training runs
+output_dir = '/home/obisin/diffusion-pipe/data/output/bengalcat'
+dataset = 'toml/bengalcatdataset.toml'
+# ═══════════════════════════════════════════════════════════════
+# TRAINING SETTINGS - AGGRESSIVE TIER (OVERNIGHT TRAINING)
+# ═══════════════════════════════════════════════════════════════
+epochs = 2
+pipeline_stages = 1
+warmup_steps = 3
+force_constant_lr = 8e-5
+#max_steps = 5
+# ═══════════════════════════════════════════════════════════════
+# MEMORY OPTIMIZATION - PUSHING 6GB LIMITS
+# ═══════════════════════════════════════════════════════════════
+activation_checkpointing = true
+reentrant_activation_checkpointing = false
+activation_checkpoint_interval = 2
+# ═══════════════════════════════════════════════════════════════
+# EVALUATION SETTINGS - MONITOR PROGRESS
+# ═══════════════════════════════════════════════════════════════
+eval_every_n_epochs = 1             # Check progress every 1 epochs
+eval_before_first_step = false
+#eval_micro_batch_size_per_gpu = 1
+#eval_gradient_accumulation_steps = 1
+
+# ═══════════════════════════════════════════════════════════════
+# CHECKPOINTING & SAVING - REGULAR SAVES
+# ═══════════════════════════════════════════════════════════════
+save_every_n_epochs = 1             # Save every 1 epochs for safety
+save_every_n_steps = 75            # Regular step saving
+checkpoint_every_n_minutes = 10     # Regular checkpointing
+save_dtype = 'bfloat16'
+
+# ═══════════════════════════════════════════════════════════════
+# PERFORMANCE SETTINGS - AGGRESSIVE TIER
+# ═══════════════════════════════════════════════════════════════
+caching_batch_size = 1
+map_num_proc = 10                    # More parallel processing for speed, based on CPU cores
+steps_per_print = 1
+logging_steps = 25
+video_clip_mode = 'single_beginning'
+
+# ═══════════════════════════════════════════════════════════════
+[model]  # OPTIMIZED FOR MAXIMUM QUALITY ON 6GB
+# ═══════════════════════════════════════════════════════════════
+type = 'wan'
+ckpt_path = 'models/wan/Wan2.1-T2V-14B'
+transformer_path = 'models/wan/Wan2_1-T2V-14B_fp8_e4m3fn.safetensors'
+llm_path = 'models/wan/umt5-xxl-enc-fp8_e4m3fn.safetensors'
+vae_path = 'models/wan/Wan2_1_VAE_fp32.safetensors'
+
+# PRECISION SETTINGS - AGGRESSIVE
+dtype = 'bfloat16'
+transformer_dtype = 'float8_e4m3fn'
+gradient_checkpointing_ratio = 0.05  # Balanced for quality vs memory
+
+# DEVICE ASSIGNMENT - SINGLE GPU
+transformer_device = 0              # Use GPU 1
+text_encoder_device = 0
+vae_device = 0
+
+# CPU OFFLOADING - All disabled for simplicity
+enable_sequential_cpu_offload = false
+text_encoder_cpu_offload = false
+vae_cpu_offload = false
+
+# MEMORY OPTIMIZATION
+init_device = "meta"
+low_cpu_mem_usage = false
+
+# ATTENTION SETTINGS - OPTIMIZED
+use_flash_attention = false
+attention_implementation = "sdpa"
+
+# ═══════════════════════════════════════════════════════════════
+[adapter]  # AGGRESSIVE LORA SETTINGS - HIGH QUALITY
+# ═══════════════════════════════════════════════════════════════
+type = 'lora'
+rank = 64                          # Higher rank for better quality
+dtype = 'bfloat16'
+dropout = 0.05                      # Light regularization
+
+# COMPREHENSIVE TARGET MODULES - BETTER COVERAGE
+target_modules = [
+    # Core attention (most important)
+    "to_q", "to_k", "to_v", "to_out.0",
+
+    # Key MLP components for knowledge adaptation
+#    "net.0", "net.2",
+
+    # Input/output projections for better feature mapping
+#    "proj_in", "proj_out"
+]
+
+# ═══════════════════════════════════════════════════════════════
+[optimizer]  # AGGRESSIVE OPTIMIZER - FASTER LEARNING
+# ═══════════════════════════════════════════════════════════════
+type = 'adamw'
+lr = 1e-4                          # Higher learning rate for faster training
+betas = [0.9, 0.9975]
+weight_decay = 0.01                # Moderate regularization
+eps = 1e-8
+
+# ═══════════════════════════════════════════════════════════════
+[monitoring]  # LOCAL MONITORING ONLY
+# ═══════════════════════════════════════════════════════════════
+enable_wandb = false
+
+# ═══════════════════════════════════════════════════════════════
+[deepspeed]  # AGGRESSIVE BATCH SETTINGS
+# ═══════════════════════════════════════════════════════════════
+zero_optimization_stage = 0
+
+# BATCH SETTINGS - OPTIMIZED FOR LEARNING
+train_micro_batch_size_per_gpu = 3
+gradient_accumulation_steps = 1
+
+# PERFORMANCE SETTINGS
+gradient_clipping = 0.8
+steps_per_print = 1
+memory_efficient_linear = true
+overlap_comm = false
+contiguous_gradients = false
+
+# COMMUNICATION OPTIMIZATION
+allgather_bucket_size = 10000000
+reduce_bucket_size = 10000000

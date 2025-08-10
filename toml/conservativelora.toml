@@ -1,0 +1,128 @@
+# ═══════════════════════════════════════════════════════════════
+# CONSERVATIVE LORA TRAINING - WAN 14B MODEL (RTX 2060 SAFE)
+# ═══════════════════════════════════════════════════════════════
+# Memory-optimized settings for 6GB VRAM
+
+# Output path for training runs
+output_dir = 'data/output'
+
+# Dataset config file
+dataset = 'toml/dogdataset.toml'
+
+# ═══════════════════════════════════════════════════════════════
+# TRAINING SETTINGS - CONSERVATIVE TIER (SAFE BASELINE)
+# ═══════════════════════════════════════════════════════════════
+epochs = 4                           # Short training for safety test
+pipeline_stages = 1
+warmup_steps = 4
+force_constant_lr = 5e-5
+
+# ═══════════════════════════════════════════════════════════════
+# MEMORY OPTIMIZATION - MAXIMUM SAFETY
+# ═══════════════════════════════════════════════════════════════
+activation_checkpointing = true
+reentrant_activation_checkpointing = false
+
+# ═══════════════════════════════════════════════════════════════
+# EVALUATION SETTINGS - MINIMAL OVERHEAD
+# ═══════════════════════════════════════════════════════════════
+eval_every_n_epochs = 4             # Less frequent evaluation
+eval_before_first_step = false
+eval_micro_batch_size_per_gpu = 1
+eval_gradient_accumulation_steps = 1
+
+# ═══════════════════════════════════════════════════════════════
+# CHECKPOINTING & SAVING - ESSENTIAL ONLY
+# ═══════════════════════════════════════════════════════════════
+save_every_n_epochs = 1
+save_every_n_steps = 75
+checkpoint_every_n_minutes = 5     # Hourly checkpointing
+save_dtype = 'bfloat16'
+
+# ═══════════════════════════════════════════════════════════════
+# PERFORMANCE SETTINGS - CONSERVATIVE TIER
+# ═══════════════════════════════════════════════════════════════
+caching_batch_size = 1
+map_num_proc = 1
+steps_per_print = 10
+logging_steps = 25
+video_clip_mode = 'single_beginning'
+
+# ═══════════════════════════════════════════════════════════════
+[model]  # OPTIMIZED FOR 6GB VRAM SAFETY
+# ═══════════════════════════════════════════════════════════════
+type = 'wan'
+ckpt_path = 'models/wan/Wan2.1-T2V-14B'
+transformer_path = 'models/wan/Wan2_1-T2V-14B_fp8_e4m3fn.safetensors'
+llm_path = 'models/wan/umt5-xxl-enc-fp8_e4m3fn.safetensors'
+vae_path = 'models/wan/Wan2_1_VAE_bf16.safetensors'
+
+# PRECISION SETTINGS - CONSERVATIVE
+dtype = 'bfloat16'
+transformer_dtype = 'float8_e4m3fn'
+gradient_checkpointing_ratio = 0.2
+
+# DEVICE ASSIGNMENT - SINGLE GPU
+transformer_device = 0
+text_encoder_device = 0
+vae_device = 0
+
+# CPU OFFLOADING - All disabled for simplicity
+enable_sequential_cpu_offload = false
+text_encoder_cpu_offload = false
+vae_cpu_offload = false
+
+# MEMORY OPTIMIZATION
+init_device = "meta"
+low_cpu_mem_usage = true
+
+# ATTENTION SETTINGS - STABLE
+use_flash_attention = false
+attention_implementation = "sdpa"
+
+# ═══════════════════════════════════════════════════════════════
+[adapter]  # CONSERVATIVE LORA SETTINGS - GUARANTEED STABILITY
+# ═══════════════════════════════════════════════════════════════
+type = 'lora'
+rank = 8                           # Lower rank for memory safety
+dtype = 'bfloat16'
+dropout = 0.085                      # Higher dropout for stability
+
+# MINIMAL TARGET MODULES - CORE ATTENTION ONLY
+target_modules = [
+    # Core attention (most important)
+    "to_q", "to_k", "to_v", "to_out.0"
+]
+
+# ═══════════════════════════════════════════════════════════════
+[optimizer]  # CONSERVATIVE OPTIMIZER - STABLE LEARNING
+# ═══════════════════════════════════════════════════════════════
+type = 'AdamW'
+betas = [0.9, 0.995]
+weight_decay = 0.025                # Moderate regularization
+eps = 1e-8
+
+# ═══════════════════════════════════════════════════════════════
+[monitoring]  # LOCAL MONITORING ONLY
+# ═══════════════════════════════════════════════════════════════
+enable_wandb = false
+
+# ═══════════════════════════════════════════════════════════════
+[deepspeed]  # CONSERVATIVE BATCH SETTINGS
+# ═══════════════════════════════════════════════════════════════
+zero_optimization_stage = 0
+
+# BATCH SETTINGS - MINIMAL MEMORY USAGE
+train_micro_batch_size_per_gpu = 1
+gradient_accumulation_steps = 1
+
+# PERFORMANCE SETTINGS
+gradient_clipping = 0.7
+steps_per_print = 1
+memory_efficient_linear = true
+overlap_comm = false
+contiguous_gradients = false
+
+# COMMUNICATION OPTIMIZATION
+allgather_bucket_size = 10000000
+reduce_bucket_size = 10000000

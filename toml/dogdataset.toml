@@ -1,0 +1,54 @@
+# ═══════════════════════════════════════════════════════════════
+# WAN DATASET CONFIGURATION - DOG IMAGE BENCHMARK
+# ═══════════════════════════════════════════════════════════════
+# Based on diffusers/dog-example images for T2V training
+# Concept: "a photo of sks dog sitting" - direct equivalent of FLUX benchmark
+# Format: diffusion-pipe WAN configuration (complete)
+
+# Resolutions to train on - 512x512 to match training config
+resolutions = [512]
+
+# Enable aspect ratio bucketing for different image sizes
+enable_ar_bucket = true
+
+# Aspect ratio settings
+min_ar = 0.5
+max_ar = 2.0
+num_ar_buckets = 7
+
+# Frame buckets for video training (includes images as frame=1)
+# For WAN T2V training: frame 1 = images, 33 = short videos
+frame_buckets = [1]
+
+# Caption shuffling settings for better training variety
+cache_shuffle_num = 0              # Keep original captions (no shuffling)
+cache_shuffle_delimiter = ", "     # Delimiter if shuffling enabled
+
+# ═══════════════════════════════════════════════════════════════
+# DATASET DIRECTORY CONFIGURATION
+# ═══════════════════════════════════════════════════════════════
+
+[[directory]]
+# Path to directory containing images and caption .txt files
+path = '/home/obisin/diffusion-pipe/data/input/dog_dataset'
+
+# Repeats - increase significantly for small datasets (5 images need lots of repeats)
+num_repeats = 50 # could do 100
+
+# Optional: Override global settings per directory
+# resolutions = [512]              # Can override per directory
+# frame_buckets = [1]              # Can force image-only per directory
+
+# ═══════════════════════════════════════════════════════════════
+# EXPECTED FILE STRUCTURE:
+# ═══════════════════════════════════════════════════════════════
+# /home/obisin/diffusion-pipe/data/input/dog_dataset/
+# ├── [filename1].jpg         # Dog image 1
+# ├── [filename1].txt         # "a photo of sks dog sitting"
+# ├── [filename2].jpg         # Dog image 2
+# ├── [filename2].txt         # "a photo of sks dog sitting"
+# └── ... (5 total image-caption pairs)
+#
+# The download script creates the .txt files automatically.
+# Each .txt file contains exactly: "a photo of sks dog sitting"
+# ═══════════════════════════════════════════════════════════════
