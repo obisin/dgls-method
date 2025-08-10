@@ -1,0 +1,58 @@
+# ═══════════════════════════════════════════════════════════════
+# SDXL DATASET CONFIGURATION - BENGAL CAT BENCHMARK
+# ═══════════════════════════════════════════════════════════════
+# Directory format (same as working WAN dataset)
+
+# Resolutions to train on - 1024x1024 for SDXL native resolution
+resolutions = [512]
+
+# Enable aspect ratio bucketing for different image sizes
+enable_ar_bucket = true
+
+# Aspect ratio settings
+min_ar = 0.5
+max_ar = 2.0
+num_ar_buckets = 7
+
+# Frame buckets for image training (SDXL = images only)
+frame_buckets = [1]
+
+# Caption shuffling settings for better training variety
+cache_shuffle_num = 0              # Keep original captions (no shuffling)
+cache_shuffle_delimiter = ", "     # Delimiter if shuffling enabled
+
+# Bucketing settings
+#min_bucket_resolution = 512
+#max_bucket_resolution = 2048
+#bucket_resolution_steps = 64
+
+# ═══════════════════════════════════════════════════════════════
+# DATASET DIRECTORY CONFIGURATION
+# ═══════════════════════════════════════════════════════════════
+
+[[directory]]
+# Path to directory containing images and caption .txt files
+path = '/home/obisin/diffusion-pipe/data/input/bengalcat'
+
+# Repeats - boundary pushing (50 images × 50 repeats = 2,500 samples)
+num_repeats = 25
+
+# ═══════════════════════════════════════════════════════════════
+# EXPECTED FILE STRUCTURE:
+# ═══════════════════════════════════════════════════════════════
+# /home/obisin/diffusion-pipe/data/input/bengalcat/
+# ├── bengal001.jpg               # Bengal cat image 1
+# ├── bengal001.txt               # "a Bengal cat"
+# ├── bengal002.jpg               # Bengal cat image 2
+# ├── bengal002.txt               # "Bengal cat with rosette patterns"
+# ├── bengal003.jpg               # Bengal cat image 3
+# ├── bengal003.txt               # "Bengal cat with marble markings"
+# └── ... (50 total image-caption pairs)
+#
+# Each .txt file contains Bengal-specific captions like:
+# - "a Bengal cat"
+# - "Bengal cat with rosette patterns"
+# - "Bengal cat with marble markings"
+# - "Bengal cat with distinctive spots"
+# - "a beautiful Bengal cat"
+# ═══════════════════════════════════════════════════════════════
