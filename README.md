@@ -4,6 +4,7 @@ Smart dynamic layer swapping between GPU and CPU for optimal performance with co
 
 ## Features
 
+* **Stackable Arguments**: All arguments are stackable together.
 * **Mixed Precision Enabled**: Can cast dtypes and handle mixed precision so you can cast manually or auto
 * **Threading and Synchronous Copy-Compute**: Background thread management with overlapped memory transfers and computation
 * **Predictive Prefetching**: Intelligently predicts and preloads layers before they're needed whilst maintaining ones needed for next compute
@@ -555,3 +556,4 @@ SOFTWARE.
 
 
 **Usage Compliance**: Users are responsible for compliance with licenses of any underlying training frameworks they integrate with DGLS.
+
