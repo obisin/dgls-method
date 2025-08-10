@@ -7,7 +7,7 @@ import psutil
 import bitsandbytes as bnb
 
 # =============================================================================
-# PRECISION FRAMEWORK CODE
+# MEMORY FRAMEWORK CODE
 # =============================================================================
 
 class MemoryMonitor:
