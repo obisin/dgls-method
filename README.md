@@ -92,6 +92,31 @@ Next Step:     [GPU: layers 3,4,5,6] [CPU: layers 0,1,2,7]
                 Always staying two layers ahead.
 ```
 
+```
+**Backward Pass (Gradient Computation):**
+Permanent residents: [GPU: layers 0,1,37,38,39] [Never move]
+
+Step 1:    [GPU: layers 0,1,36,37,38,39] [CPU: layers 2,3,4,...,35]
+           ↓ Compute gradients for layer 37 (resident)
+           ↓ Need layer 38 (resident, already on GPU) ✓
+           ↓ Fetch layer 36 for next step
+           
+Step 2:    [GPU: layers 0,1,35,36,37,38,39] [CPU: layers 2,3,...,34]  
+           ↓ Compute gradients for layer 36 (already on GPU)
+           ↓ Need layer 37 (resident, already on GPU) ✓
+           ↓ Fetch layer 35, CAN'T drop 38 (resident)
+           
+Step 3:    [GPU: layers 0,1,34,35,36,37,38,39] [CPU: layers 2,3,...,33]
+           ↓ Compute gradients for layer 35 (already on GPU)
+           ↓ Need layer 36 (already on GPU) ✓
+           ↓ Fetch layer 34, CAN'T drop 37 (resident)
+           
+Step 4:    [GPU: layers 0,1,33,34,35,37,38,39] [CPU: layers 2,3,...,32,36]
+           ↓ Compute gradients for layer 34 (already on GPU)
+           ↓ Need layer 35 (already on GPU) ✓
+           ↓ Fetch layer 33, NOW can drop 36 (no longer needed, not resident)
+```
+
 **Threading Integration**: best when you increase your batch size, have larger prefetch windows, train with larger models, larger datasets or all combined. This is due to compute time being faster than trasnfers. 
 This however enables better training with higher settings to find the optimal balance between compute and copy speeds. 
 
@@ -556,4 +581,5 @@ SOFTWARE.
 
 
 **Usage Compliance**: Users are responsible for compliance with licenses of any underlying training frameworks they integrate with DGLS.
+
 
