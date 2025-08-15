@@ -1044,7 +1044,7 @@ class PackedCPUBlock:
 
             packed_cpu = self.packed_buffers[dtype]
 
-            gpu_buffer = pinned_staging.to(GPU_DEVICE, non_blocking=True)
+            gpu_buffer = packed_cpu.to(GPU_DEVICE, non_blocking=True)
 
             # Record event and keep buffer alive
             event = torch.cuda.Event()
@@ -2995,6 +2995,7 @@ if __name__ == '__main__':
     if is_main_process():
         print('TRAINING COMPLETE!') #PRINT times etc here and final ststas
         track_step_performance(step_duration, step, total_layer_compute, True)
+
 
 
 
