@@ -207,7 +207,7 @@ This however enables better training with higher settings to find the optimal ba
 
 #### `--async_zero_grad`
 **Default**: `False`  
-**Usage**: Zero gradients asynchronously on separate CUDA stream  
+**Usage**: Zero gradients synchronously on separate CUDA stream  
 **When to use**: With CUDA streams for additional overlap
 ```bash
 --async_zero_grad  # Async gradient zeroing
@@ -581,5 +581,6 @@ SOFTWARE.
 
 
 **Usage Compliance**: Users are responsible for compliance with licenses of any underlying training frameworks they integrate with DGLS.
+
 
 
